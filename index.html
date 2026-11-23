@@ -167,6 +167,9 @@ nav button:active{background:var(--purple-d)}
     if(days<1)return "今天"; if(days<30)return Math.floor(days)+" 天前";
     if(days<365)return Math.floor(days/30)+" 個月前"; return Math.floor(days/365)+" 年前"}
   function isNew(r){return (Date.now()-new Date(r.pushed_at||r.updated_at))/864e5<=30}
+  // 只保留 Description 含「game／遊戲」等字樣的倉庫；沒有 Description 的倉庫一律不顯示
+  var GAME_RE=/game|遊戲|游戏|ゲーム|게임/i;
+  function isGame(r){return !!r.description&&GAME_RE.test(r.description)}
 
   function skeleton(){grid.innerHTML=Array(12).join("<div class='item sk'><div class='ico'></div><div class='nm'>&nbsp;</div></div>")}
 
@@ -176,7 +179,7 @@ nav button:active{background:var(--purple-d)}
     if(filter==="hot")list=list.filter(function(r){return r.stargazers_count>0}).sort(function(a,b){return b.stargazers_count-a.stargazers_count});
     if(filter==="own")list=list.filter(function(r){return !r.fork});
     if(!list.length){
-      grid.innerHTML="<div class='msg'>這個分類目前沒有倉庫。<br><button id='again'>重新整理</button></div>";
+      grid.innerHTML="<div class='msg'>這個分類目前沒有遊戲倉庫。<br><small>僅顯示 Description 含 game／遊戲 的倉庫。</small><br><button id='again'>重新整理</button></div>";
       var b=$("#again"); if(b)b.onclick=load; return;
     }
     grid.innerHTML=list.map(function(r,i){
@@ -359,12 +362,13 @@ nav button:active{background:var(--purple-d)}
     Promise.all([ghGet(base,mapUser),ghGet(base+"/repos?per_page=100&sort=updated",mapRepos)]).then(function(rs){
       return rs;
     }).then(function(rs){
-      var u=rs[0].data; repos=rs[1].data; var stale=rs[0].stale||rs[1].stale;
+      var u=rs[0].data, allRepos=rs[1].data; var stale=rs[0].stale||rs[1].stale;
+      repos=allRepos.filter(isGame);
       $("#uname").textContent=u.name||u.login;
       $("#avatar").src=u.avatar_url;
       $("#ubio").textContent=u.bio||("@"+u.login);
-      $("#ustats").innerHTML="<span>倉庫 "+u.public_repos+"</span><span>追蹤者 "+u.followers+"</span><span>追蹤中 "+u.following+"</span>";
-      profCap=u.login+" 共 "+repos.length+" 個公開倉庫，點選圖示開啟網站。";updateCap();
+      $("#ustats").innerHTML="<span>遊戲 "+repos.length+" / "+allRepos.length+"</span><span>追蹤者 "+u.followers+"</span><span>追蹤中 "+u.following+"</span>";
+      profCap=u.login+" 共 "+repos.length+" 個遊戲倉庫（已排除 "+(allRepos.length-repos.length)+" 個非遊戲），點選圖示開啟網站。";updateCap();
       statusEl.textContent=(stale?"GitHub 暫停請求，顯示先前資料：「":"已更新：「")+u.login+"」"+new Date().toLocaleTimeString("zh-TW");lastLoad=Date.now();
       $("#dot").classList.remove("on");
       render(); buildMarquee(); buildBanner();
