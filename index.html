@@ -304,6 +304,8 @@ nav button:active{background:var(--purple-d)}
   function updateCap(){
     var i=curIdx(), r=slideRepos[i];
     capEl.textContent=r?(r.name+(r.description?"：":"")+(r.description||"")):profCap;
+    var md=r?(r.description||"").replace(/\s+/g," ").trim():"";if(md.length>40)md=md.slice(0,40)+"…";
+    setMq(r?(r.name+(md?"："+md:"")):(user+" 的遊戲倉庫"));
     dotsEl.querySelectorAll("i").forEach(function(d,n){d.classList.toggle("on",n===i)});
   }
   function drawDots(){dotsEl.innerHTML=slideRepos.map(function(){return "<i></i>"}).join("");updateCap()}
@@ -327,20 +329,14 @@ nav button:active{background:var(--purple-d)}
       });
     })();
   }
-  var msgs=[], mi=0, mqTimer=null;
-  function showMsg(){
+  // 跑馬燈文字由目前顯示的輪播圖決定（見 updateCap），不再自己計時，避免與圖片差一格
+  var mqLast="";
+  function setMq(txt){
+    if(txt===mqLast)return; mqLast=txt;
     var el=$("#mq"); el.classList.add("out");
-    setTimeout(function(){el.textContent=msgs[mi%msgs.length];el.classList.remove("out")},400);
+    setTimeout(function(){el.textContent=mqLast;el.classList.remove("out")},300);
   }
-  function buildMarquee(){
-    msgs=repos.filter(function(r){return r.description}).map(function(r){
-      var d=r.description.replace(/\s+/g," ").trim(); if(d.length>40)d=d.slice(0,40)+"…";
-      return r.name+"："+d});
-    if(!msgs.length)msgs=["目前沒有可顯示的倉庫說明。"];
-    mi=0; $("#mq").textContent=msgs[0];
-    if(mqTimer)clearInterval(mqTimer);
-    mqTimer=setInterval(function(){if(document.hidden||msgs.length<2)return;mi=(mi+1)%msgs.length;showMsg()},6000);
-  }
+  function buildMarquee(){ mqLast=""; updateCap(); }
   slidesEl.addEventListener("scroll",updateCap);
   ["pointerdown","touchstart","wheel"].forEach(function(ev){slidesEl.addEventListener(ev,function(){pause=Date.now()+8000},{passive:true})});
   if(timer)clearInterval(timer);

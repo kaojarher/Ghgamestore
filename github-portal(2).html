@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GH 倉庫入口</title>
+<style>
+:root{
+  --purple:#3d1a8c; --purple-d:#2c1066; --lav:#c9c8f5; --orange:#ff6a00;
+  --blue:#2f6db5; --pink:#ee8fc0; --cyan:#3cc3ee; --bg:#f4f4f6; --ink:#222;
+  --card:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink);
+  padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));padding-top:env(safe-area-inset-top,0px)}
+.wrap{max-width:960px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff;border-bottom:4px solid var(--lav)}
+.logo{display:flex;align-items:baseline;gap:8px;color:var(--purple);text-decoration:none}
+.logo b{font-size:44px;font-weight:900;letter-spacing:-3px;font-style:italic;line-height:1}
+.logo span{font-size:24px;font-weight:700}
+.tools{display:flex;gap:8px}
+.ibtn{width:42px;height:42px;border:3px solid var(--purple);border-radius:10px;background:#fff;color:var(--purple);
+  display:grid;place-items:center;cursor:pointer;position:relative}
+.ibtn svg{width:22px;height:22px;fill:currentColor}
+.ibtn.spin svg{animation:r .8s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.dot{position:absolute;top:-5px;right:-5px;width:12px;height:12px;border-radius:50%;background:#ee2222;display:none}
+.dot.on{display:block}
+.marq{display:flex;gap:8px;align-items:center;padding:10px 12px;font-size:14px;color:var(--purple)}
+.banner{position:relative;margin:0 6px;min-height:200px;border-radius:4px;overflow:hidden;color:#fff;
+  background:linear-gradient(120deg,#2b2540 0%,#5b4a7a 45%,#a9967f 100%);display:flex;align-items:flex-end}
+.banner::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 80% 30%,rgba(255,255,255,.22),transparent 40%),
+  radial-gradient(circle at 15% 20%,rgba(255,200,120,.25),transparent 35%)}
+.bn{position:relative;display:flex;gap:16px;align-items:center;padding:18px 16px 44px;width:100%}
+.bn img{width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:#fff;object-fit:cover;flex:none}
+.bn h1{font-size:clamp(26px,6vw,44px);font-weight:900;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.bn p{font-size:14px;opacity:.95;margin-top:6px}
+.bn .stats{margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;font-weight:700}
+.cap{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);padding:8px 12px;font-size:14px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec{display:flex;align-items:center;gap:8px;padding:12px 12px 8px;color:var(--orange);font-size:26px;font-weight:900}
+.sec i{width:14px;height:28px;background:var(--orange);clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
+.tabs{display:flex;gap:6px;padding:0 6px;border-bottom:4px solid var(--orange);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:92px;padding:10px 8px;border:0;border-radius:8px 8px 0 0;color:#fff;font-size:clamp(15px,4vw,22px);
+  font-weight:800;cursor:pointer;font-family:inherit}
+.tab[data-f=all]{background:var(--blue)}
+.tab[data-f=new]{background:var(--pink)}
+.tab[data-f=hot]{background:var(--cyan)}
+.tab[data-f=own]{background:#7b63d9}
+.tab.on{background:var(--orange)!important}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 10px;padding:14px 10px}
+@media(min-width:640px){.grid{gap:20px 14px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.item{display:block;min-width:0;width:100%;padding:0;text-decoration:none;color:var(--ink);text-align:center;cursor:pointer;background:none;border:0;font-family:inherit}
+.ico{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;display:grid;place-items:center;
+  color:#fff;font-weight:900;font-size:clamp(26px,8vw,48px);box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .15s}
+.item:active .ico,.item:hover .ico{transform:scale(.96)}
+.item:focus-visible{outline:3px solid var(--purple);outline-offset:3px;border-radius:12px}
+.pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff;opacity:0;transition:opacity .25s}.pic.ok{opacity:1}.rib,.lang{z-index:2}
+.info{position:absolute;top:5px;left:5px;z-index:3;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font:700 13px/22px serif;font-style:italic;text-align:center}
+.shot{width:100%;max-height:200px;object-fit:contain;background:#f0f0f4;border-radius:10px;margin:6px 0}
+.rib{position:absolute;top:10px;right:-26px;width:90px;transform:rotate(45deg);font-size:11px;font-weight:800;padding:2px 0;color:#fff}
+.rib.n{background:#e8583a}.rib.r{background:#1f9a4d}
+.lang{position:absolute;left:6px;bottom:6px;background:rgba(255,255,255,.92);color:#333;font-size:10px;font-weight:800;
+  padding:2px 5px;border-radius:4px}
+.nm{margin-top:6px;font-size:clamp(13px,3.6vw,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg{grid-column:1/-1;text-align:center;padding:30px 10px;color:#666;line-height:1.7}
+.msg button{margin-top:10px;padding:10px 18px;border:0;border-radius:8px;background:var(--purple);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.sk .ico{background:linear-gradient(90deg,#e2e2e8,#f0f0f4,#e2e2e8);background-size:200%;animation:s 1.2s infinite}
+@keyframes s{to{background-position:-200% 0}}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--purple);border-top:3px solid var(--lav);
+  padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav button{flex:1;padding:16px 4px;border:0;border-right:2px solid var(--purple-d);background:none;color:#fff;
+  font-size:clamp(15px,4.4vw,22px);font-weight:800;cursor:pointer;font-family:inherit}
+nav button:last-child{border-right:0}
+nav button:active{background:var(--purple-d)}
+.panel{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;z-index:30}
+.panel.on{display:flex}
+.sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px));
+  animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h3{color:var(--purple);font-size:22px;margin-bottom:12px}
+.sheet p{font-size:14px;color:#555;line-height:1.7;margin:6px 0}
+.sheet .row{display:flex;gap:8px;margin-top:10px}
+.sheet input{flex:1;min-width:0;padding:12px;border:2px solid var(--lav);border-radius:10px;font-size:16px}
+.sheet .go{padding:12px 18px;border:0;border-radius:10px;background:var(--orange);color:#fff;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.sheet .alt{background:var(--purple)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta span{background:#eeedfb;color:var(--purple);border-radius:20px;padding:3px 10px;font-size:13px;font-weight:700}
+.banner{display:block;height:clamp(210px,55vw,360px);background:#2b2540}
+.banner::before{display:none}
+.slides{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;position:relative;overflow:hidden;cursor:pointer}
+.prof{display:flex;align-items:flex-end;cursor:default;background:linear-gradient(120deg,#2b2540 0%,#5b4a7a 45%,#a9967f 100%)}
+.prof::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 30%,rgba(255,255,255,.22),transparent 40%),radial-gradient(circle at 15% 20%,rgba(255,200,120,.25),transparent 35%)}
+.slide>img.shotbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1d1a2b}
+.dots{position:absolute;right:10px;bottom:46px;display:flex;gap:6px;z-index:3}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5)}
+.dots i.on{background:var(--orange)}
+.cap{z-index:3}
+.mq{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mq span{display:block;overflow:hidden;text-overflow:ellipsis;transition:opacity .4s}.mq span.out{opacity:0}
+#status{margin-left:auto;font-size:12px;font-weight:600;color:#888;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.marq svg{flex:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="#" id="home"><b>GH</b><span>倉庫</span></a>
+    <div class="tools">
+      <button class="ibtn" id="refresh" aria-label="重新整理"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A8 8 0 1 0 19.74 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><i class="dot" id="dot"></i></button>
+      <button class="ibtn" id="who" aria-label="切換帳戶"><svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-3.6 0-8 1.8-8 5v2h16v-2c0-3.2-4.4-5-8-5z"/></svg></button>
+      <button class="ibtn" id="menu" aria-label="選單"><svg viewBox="0 0 24 24"><path d="M3 6h18v2.5H3zm0 5h18v2.5H3zm0 5h18v2.5H3z"/></svg></button>
+    </div>
+  </header>
+
+  <div class="marq"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg><div class="mq"><span id="mq">載入倉庫說明中…</span></div></div>
+
+  <section class="banner" aria-live="polite"><div class="slides" id="slides"><div class="slide prof"><div class="bn">
+      <img id="avatar" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
+      <div>
+        <h1 id="uname">kaojarher</h1>
+        <p id="ubio">GitHub 公開倉庫入口</p>
+        <div class="stats" id="ustats"></div>
+      </div>
+    </div>
+    </div></div><div class="cap" id="cap">載入中…</div><div class="dots" id="dots"></div></section>
+
+  <div class="sec"><i></i>倉庫中心<span id="status"></span></div>
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-f="all" role="tab">全部倉庫</button>
+    <button class="tab" data-f="new" role="tab">最近更新</button>
+    <button class="tab" data-f="hot" role="tab">熱門星標</button>
+    <button class="tab" data-f="own" role="tab">原創專案</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<nav>
+  <button id="nHome">首頁</button>
+  <button id="nHub">倉庫中心</button>
+  <button id="nProfile">個人檔案</button>
+  <button id="nSwitch">換帳戶</button>
+</nav>
+
+<div class="panel" id="panel"><div class="sheet" id="sheet"></div></div>
+
+<script>
+(function(){
+  var DEFAULT="kaojarher", KEY="gh_portal_user";
+  var user=DEFAULT, repos=[], filter="all", loading=false, lastLoad=0;
+  var $=function(s){return document.querySelector(s)};
+  var grid=$("#grid"), statusEl=$("#status");
+
+  try{var saved=localStorage.getItem(KEY); if(saved) user=saved;}catch(e){}
+  var q=new URLSearchParams(location.search).get("user"); if(q) user=q.trim();
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+  function ago(d){var days=(Date.now()-new Date(d))/864e5;
+    if(days<1)return "今天"; if(days<30)return Math.floor(days)+" 天前";
+    if(days<365)return Math.floor(days/30)+" 個月前"; return Math.floor(days/365)+" 年前"}
+  function isNew(r){return (Date.now()-new Date(r.pushed_at||r.updated_at))/864e5<=30}
+  // 只保留 Description 含「game／遊戲」等字樣的倉庫；沒有 Description 的倉庫一律不顯示
+  var GAME_RE=/game|遊戲|游戏|ゲーム|게임/i;
+  function isGame(r){return !!r.description&&GAME_RE.test(r.description)}
+
+  function skeleton(){grid.innerHTML=Array(12).join("<div class='item sk'><div class='ico'></div><div class='nm'>&nbsp;</div></div>")}
+
+  function render(){
+    var list=repos.slice();
+    if(filter==="new")list=list.filter(isNew);
+    if(filter==="hot")list=list.filter(function(r){return r.stargazers_count>0}).sort(function(a,b){return b.stargazers_count-a.stargazers_count});
+    if(filter==="own")list=list.filter(function(r){return !r.fork});
+    if(!list.length){
+      grid.innerHTML="<div class='msg'>這個分類目前沒有遊戲倉庫。<br><small>僅顯示 Description 含 game／遊戲 的倉庫。</small><br><button id='again'>重新整理</button></div>";
+      var b=$("#again"); if(b)b.onclick=load; return;
+    }
+    grid.innerHTML=list.map(function(r,i){
+      var h=hue(r.name), ch=esc(r.name.charAt(0).toUpperCase());
+      var rib=isNew(r)?"<span class='rib n'>最新</span>":(r.stargazers_count>0?"<span class='rib r'>推薦</span>":"");
+      var lang=r.language?"<span class='lang'>"+esc(r.language)+"</span>":"";
+      return "<button class='item' data-i='"+repos.indexOf(r)+"'><div class='ico' style='background:linear-gradient(135deg,hsl("+h+",70%,52%),hsl("+((h+50)%360)+",75%,38%))'>"+ch+"<img class='pic' alt='' loading='lazy'>"+rib+lang+"<span class='info' data-info role='button' aria-label='倉庫詳情'>i</span>"+"</div><div class='nm'>"+esc(r.name)+"</div></button>";
+    }).join("");
+    grid.querySelectorAll(".item[data-i]").forEach(function(b){loadIcon(b.querySelector(".pic"),repos[+b.dataset.i])});
+  }
+
+  var NAMES=["icon.png","logo.png","cover.png","preview.png","screenshot.png","banner.png","icon.jpg","logo.jpg","cover.jpg","preview.jpg"];
+  function ck(r){return "gh_icon_"+r.full_name}
+  function rawUrl(r,path){return "https://raw.githubusercontent.com/"+r.full_name+"/"+(r.default_branch||"main")+"/"+path.split("/").map(encodeURIComponent).join("/")}
+  function lastKey(r){return "gh_last_"+r.full_name}
+  function lastIcon(r){try{return localStorage.getItem(lastKey(r))}catch(e){return null}}
+  function setIcon(img,url,r){
+    img.onload=function(){img.classList.add("ok");if(r)try{localStorage.setItem(lastKey(r),url)}catch(e){}};
+    img.onerror=function(){
+      img.classList.remove("ok");
+      var l=r?lastIcon(r):null;
+      if(l&&l!==url){img.onerror=function(){img.classList.remove("ok")};img.onload=function(){img.classList.add("ok")};img.src=l}
+    };
+    img.src=url;
+  }
+  function loadIcon(img,r){
+    if(!img)return;
+    pageThumb(r,400,400,"gh_pi_",function(u){if(u)setIcon(img,u,r);else{var l=lastIcon(r);if(l)setIcon(img,l,r);else loadRepoIcon(img,r)}});
+  }
+  function loadRepoIcon(img,r){
+    var c=null;try{c=localStorage.getItem(ck(r))}catch(e){}
+    if(c&&c!=="none"){setIcon(img,c,r);return}
+    if(c==="none")return;
+    var i=0;
+    (function next(){
+      if(i>=NAMES.length){try{localStorage.setItem(ck(r),"none")}catch(e){}return}
+      var u=rawUrl(r,NAMES[i++]),t=new Image();
+      t.onload=function(){try{localStorage.setItem(ck(r),u)}catch(e){}setIcon(img,u,r)};
+      t.onerror=next; t.src=u;
+    })();
+  }
+  // GitHub API：使用 ETag 條件請求（回應 304 不計入每小時次數），額度用完時改用已存的資料
+  function ghGet(url,map){
+    var k="gh_api_"+url,c=null;
+    try{c=JSON.parse(localStorage.getItem(k))}catch(e){}
+    var h={};if(c&&c.etag)h["If-None-Match"]=c.etag;
+    return fetch(url,{headers:h,cache:"no-store"}).then(function(x){
+      if(x.status===304&&c)return {data:c.data};
+      if(x.status===404)throw new Error("404");
+      if(x.status===403||x.status===429){if(c)return {data:c.data,stale:true};throw new Error("RATE")}
+      if(!x.ok)throw new Error("HTTP "+x.status);
+      var et=x.headers.get("ETag");
+      return x.json().then(function(d){
+        if(map)d=map(d);
+        try{localStorage.setItem(k,JSON.stringify({etag:et,data:d}))}catch(e){}
+        return {data:d};
+      });
+    });
+  }
+  function mapUser(u){return {login:u.login,name:u.name,avatar_url:u.avatar_url,bio:u.bio,public_repos:u.public_repos,followers:u.followers,following:u.following}}
+  function mapRepos(a){return a.map(function(r){return {name:r.name,full_name:r.full_name,description:r.description,language:r.language,stargazers_count:r.stargazers_count,forks_count:r.forks_count,fork:r.fork,html_url:r.html_url,homepage:r.homepage,has_pages:r.has_pages,default_branch:r.default_branch,pushed_at:r.pushed_at,updated_at:r.updated_at,owner:{login:r.owner.login}}})}
+  function mapTree(d){return (d.tree||[]).filter(function(n){return n.type==="blob"&&/\.(png|jpe?g|webp|gif|svg)$/i.test(n.path)&&!/node_modules|\.github\//i.test(n.path)}).map(function(n){return n.path}).slice(0,20)}
+  function scanRepo(r,box){
+    box.innerHTML="<p>正在掃描倉庫內的圖片…</p>";
+    ghGet("https://api.github.com/repos/"+r.full_name+"/git/trees/"+encodeURIComponent(r.default_branch||"main")+"?recursive=1",mapTree)
+    .then(function(x){
+      var f=x.data;
+      if(!f.length){box.innerHTML="<p>此倉庫內沒有找到圖片檔。</p>";try{localStorage.setItem(ck(r),"none")}catch(e){}return}
+      var u=rawUrl(r,f[0]);
+      box.innerHTML="<img class='shot' alt='' src='"+esc(u)+"'><p>已找到第一張圖片：<b>"+esc(f[0])+"</b>，並設為圖示。</p>";
+      try{localStorage.setItem(ck(r),u)}catch(e){}
+      var b=grid.querySelector(".item[data-i='"+repos.indexOf(r)+"'] .pic"); if(b)setIcon(b,u,r);
+    }).catch(function(e){
+      var m=e.message==="Failed to fetch"?"網路連線失敗。":e.message==="RATE"?"GitHub 暫時限制請求，請稍後再試。":e.message==="404"?"找不到檔案清單（可能是空倉庫）。":"無法讀取檔案清單。";
+      box.innerHTML="<p>"+esc(m)+"</p>"});
+  }
+
+  var SHOT=["screenshot.png","preview.png","cover.png","banner.png","screenshot.jpg","preview.jpg","cover.jpg","banner.jpg"];
+  var profCap="", slideRepos=[null], buildId=0, timer=null, pause=0;
+  var slidesEl=$("#slides"), dotsEl=$("#dots"), capEl=$("#cap");
+
+  function webUrl(r){
+    if(r.has_pages){var o=r.owner.login.toLowerCase();return r.name.toLowerCase()===o+".github.io"?"https://"+o+".github.io/":"https://"+o+".github.io/"+r.name+"/"}
+    if(r.homepage&&/^https?:\/\//i.test(r.homepage))return r.homepage;
+    return null;
+  }
+  // Pages 首頁縮圖：WordPress mShots（第一次產生需要時間，最多重試 3 次；成功結果在瀏覽器保存 7 天）
+  function pageThumb(r,W,H,pre,cb){
+    var w=webUrl(r); if(!w)return cb(null);
+    var k=pre+r.full_name,c=null,old=null;
+    try{c=localStorage.getItem(k)}catch(e){}
+    if(c){var p=c.split("|");old=p.slice(1).join("|");if(Date.now()-(+p[0])<6048e5)return cb(old)}
+    (function go(n){
+      var u="https://s.wordpress.com/mshots/v1/"+encodeURIComponent(w)+"?w="+W+"&h="+H,t=new Image();
+      t.onload=function(){
+        if(t.naturalWidth>=W){try{localStorage.setItem(k,Date.now()+"|"+u)}catch(e){}cb(u)}
+        else if(n<3)setTimeout(function(){go(n+1)},3000);
+        else cb(old);
+      };
+      t.onerror=function(){cb(old)};
+      t.src=u+"&t="+n;
+    })(0);
+  }
+  function getShot(r,cb){pageThumb(r,800,500,"gh_ps_",function(u){u?cb(u):getRepoShot(r,cb)})}
+  function getRepoShot(r,cb){
+    var k="gh_shot_"+r.full_name, c=null, ic=null;
+    try{c=localStorage.getItem(k);ic=localStorage.getItem(ck(r))}catch(e){}
+    if(c&&c!=="none")return cb(c);
+    function fallback(){cb(ic&&ic!=="none"?ic:null)}
+    if(c==="none")return fallback();
+    var i=0;
+    (function next(){
+      if(i>=SHOT.length){
+        try{localStorage.setItem(k,"none")}catch(e){}return fallback();
+      }
+      var u=rawUrl(r,SHOT[i++]),t=new Image();
+      t.onload=function(){try{localStorage.setItem(k,u)}catch(e){}cb(u)};
+      t.onerror=next; t.src=u;
+    })();
+  }
+  function curIdx(){var w=slidesEl.clientWidth||1;return Math.round(slidesEl.scrollLeft/w)}
+  function updateCap(){
+    var i=curIdx(), r=slideRepos[i];
+    capEl.textContent=r?(r.name+(r.description?"：":"")+(r.description||"")):profCap;
+    var md=r?(r.description||"").replace(/\s+/g," ").trim():"";if(md.length>40)md=md.slice(0,40)+"…";
+    setMq(r?(r.name+(md?"："+md:"")):(user+" 的遊戲倉庫"));
+    dotsEl.querySelectorAll("i").forEach(function(d,n){d.classList.toggle("on",n===i)});
+  }
+  function drawDots(){dotsEl.innerHTML=slideRepos.map(function(){return "<i></i>"}).join("");updateCap()}
+  function buildBanner(){
+    var id=++buildId, list=repos.slice(), n=0;
+    slidesEl.querySelectorAll(".slide:not(.prof)").forEach(function(x){x.remove()});
+    slideRepos=[null]; slidesEl.scrollLeft=0; drawDots();
+    (function step(){
+      if(id!==buildId||n>=list.length||slideRepos.length>12)return;
+      var r=list[n++];
+      getShot(r,function(u){
+        if(id!==buildId)return;
+        if(u){
+          var d=document.createElement("div"); d.className="slide";
+          var im=document.createElement("img"); im.className="shotbg"; im.alt=r.name; im.src=u;
+          im.onerror=function(){d.remove();var x=slideRepos.indexOf(r);if(x>0)slideRepos.splice(x,1);drawDots()};
+          d.appendChild(im); d.onclick=function(){openRepo(r)};
+          slidesEl.appendChild(d); slideRepos.push(r); drawDots();
+        }
+        step();
+      });
+    })();
+  }
+  // 跑馬燈文字由目前顯示的輪播圖決定（見 updateCap），不再自己計時，避免與圖片差一格
+  var mqLast="";
+  function setMq(txt){
+    if(txt===mqLast)return; mqLast=txt;
+    var el=$("#mq"); el.classList.add("out");
+    setTimeout(function(){el.textContent=mqLast;el.classList.remove("out")},300);
+  }
+  function buildMarquee(){ mqLast=""; updateCap(); }
+  slidesEl.addEventListener("scroll",updateCap);
+  ["pointerdown","touchstart","wheel"].forEach(function(ev){slidesEl.addEventListener(ev,function(){pause=Date.now()+8000},{passive:true})});
+  if(timer)clearInterval(timer);
+  timer=setInterval(function(){
+    if(Date.now()<pause||document.hidden||slideRepos.length<2)return;
+    var w=slidesEl.clientWidth, i=(curIdx()+1)%slideRepos.length;
+    slidesEl.scrollTo({left:w*i,behavior:"smooth"});
+  },6000);
+
+  function setSpin(on){$("#refresh").classList.toggle("spin",on)}
+
+  function load(){
+    if(loading)return; loading=true; setSpin(true);
+    statusEl.textContent="正在重新整理 "+user+" 的倉庫…";
+    skeleton();
+    var t=Date.now();
+    try{Object.keys(localStorage).forEach(function(k){if((k.indexOf('gh_icon_')===0||k.indexOf('gh_shot_')===0)&&localStorage.getItem(k)==='none')localStorage.removeItem(k)})}catch(e){}
+    var base="https://api.github.com/users/"+encodeURIComponent(user);
+    Promise.all([ghGet(base,mapUser),ghGet(base+"/repos?per_page=100&sort=updated",mapRepos)]).then(function(rs){
+      return rs;
+    }).then(function(rs){
+      var u=rs[0].data, allRepos=rs[1].data; var stale=rs[0].stale||rs[1].stale;
+      repos=allRepos.filter(isGame);
+      $("#uname").textContent=u.name||u.login;
+      $("#avatar").src=u.avatar_url;
+      $("#ubio").textContent=u.bio||("@"+u.login);
+      $("#ustats").innerHTML="<span>遊戲 "+repos.length+" / "+allRepos.length+"</span><span>追蹤者 "+u.followers+"</span><span>追蹤中 "+u.following+"</span>";
+      profCap=u.login+" 共 "+repos.length+" 個遊戲倉庫（已排除 "+(allRepos.length-repos.length)+" 個非遊戲），點選圖示開啟網站。";updateCap();
+      statusEl.textContent=(stale?"GitHub 暫停請求，顯示先前資料：「":"已更新：「")+u.login+"」"+new Date().toLocaleTimeString("zh-TW");lastLoad=Date.now();
+      $("#dot").classList.remove("on");
+      render(); buildMarquee(); buildBanner();
+    }).catch(function(e){
+      var m=e.message==="Failed to fetch"?"網路連線失敗，請檢查網路後重試。":e.message==="404"?"找不到帳戶「"+user+"」，請確認名稱後再試。":e.message==="RATE"?"GitHub 暫時限制未登入請求（每小時 60 次），且這個帳戶尚無已存資料。請約 1 小時後再試。":"GitHub 回應異常（"+e.message+"）。";
+      statusEl.textContent="載入失敗";
+      grid.innerHTML="<div class='msg'>"+esc(m)+"<br><button id='again'>再試一次</button></div>";
+      $("#again").onclick=load;
+    }).then(function(){loading=false;setSpin(false)});
+  }
+
+  function openSheet(html){$("#sheet").innerHTML=html;$("#panel").classList.add("on")}
+  function closeSheet(){$("#panel").classList.remove("on")}
+  $("#panel").addEventListener("click",function(e){if(e.target===this)closeSheet()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+
+  function accountSheet(){
+    openSheet("<h3>切換 GitHub 帳戶</h3><p>預設帳戶為 "+DEFAULT+"。輸入其他使用者名稱即可瀏覽其公開倉庫。</p>"+
+      "<div class='row'><input id='uin' value='"+esc(user)+"' autocapitalize='off' autocomplete='off' aria-label='GitHub 使用者名稱'><button class='go' id='ugo'>載入</button></div>"+
+      "<div class='row'><button class='go alt' id='ureset' style='flex:1'>回到預設帳戶</button></div>");
+    $("#ugo").onclick=function(){var v=$("#uin").value.trim(); if(v){user=v;try{localStorage.setItem(KEY,v)}catch(e){} closeSheet();load();}};
+    $("#ureset").onclick=function(){user=DEFAULT;try{localStorage.removeItem(KEY)}catch(e){} closeSheet();load();};
+    $("#uin").onkeydown=function(e){if(e.key==="Enter")$("#ugo").click()};
+  }
+
+  function showRepo(r){
+    var w=webUrl(r);
+    openSheet("<h3>"+esc(r.name)+"</h3><p>"+esc(r.description||"此倉庫尚未填寫說明。")+"</p>"+
+      "<div class='meta'>"+(r.language?"<span>"+esc(r.language)+"</span>":"")+"<span>★ "+r.stargazers_count+"</span><span>分支 "+r.forks_count+"</span><span>更新於 "+ago(r.pushed_at||r.updated_at)+"</span>"+(r.fork?"<span>Fork</span>":"")+"</div>"+
+      "<div class='row'><a class='go' style='flex:1' target='_blank' rel='noopener' href='"+esc(r.html_url)+"'>開啟倉庫</a>"+
+      (w?"<a class='go alt' style='flex:1' target='_blank' rel='noopener' href='"+esc(w)+"'>開啟網站</a>":"")+"</div><div id='scan'></div>");
+    scanRepo(r,$("#scan"));
+  }
+  function openRepo(r){var u=webUrl(r); if(u)window.open(u,"_blank","noopener"); else showRepo(r)}
+  grid.addEventListener("click",function(e){
+    var b=e.target.closest(".item[data-i]"); if(!b)return;
+    var r=repos[+b.dataset.i]; if(!r)return;
+    if(e.target.closest("[data-info]"))showRepo(r); else openRepo(r);
+  });
+
+
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick=function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on")});
+      t.classList.add("on"); filter=t.dataset.f;
+      render();          // 只在本機篩選，不消耗 API 次數
+    };
+  });
+
+  $("#refresh").onclick=load;
+  $("#who").onclick=accountSheet;
+  $("#nSwitch").onclick=accountSheet;
+  $("#menu").onclick=function(){
+    openSheet("<h3>選單</h3><div class='row'><a class='go alt' style='flex:1' target='_blank' rel='noopener' href='https://github.com/"+encodeURIComponent(user)+"'>GitHub 個人頁</a><a class='go' style='flex:1' target='_blank' rel='noopener' href='https://github.com/"+encodeURIComponent(user)+"?tab=stars'>星標清單</a></div>");
+  };
+  $("#nProfile").onclick=function(){window.open("https://github.com/"+encodeURIComponent(user),"_blank","noopener")};
+  function top(e){if(e)e.preventDefault();window.scrollTo({top:0,behavior:"smooth"})}
+  $("#home").onclick=top; $("#nHome").onclick=top;
+  $("#nHub").onclick=function(){document.querySelector(".sec").scrollIntoView({behavior:"smooth"})};
+
+  // 每次進入／返回入口都重新整理
+  window.addEventListener("pageshow",function(e){if(e.persisted)load()});
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&repos.length&&Date.now()-lastLoad>60000)load()});
+
+  load();
+})();
+</script>
+</body>
+</html>
